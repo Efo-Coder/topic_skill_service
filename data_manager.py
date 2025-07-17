@@ -1,7 +1,6 @@
 import json
 import os
 
-
 class JsonDataManager:
     def __init__(self):
         pass
@@ -22,7 +21,7 @@ class JsonDataManager:
             return []
 
 
-    def write_data(self, filepath):
+    def write_data(self, filepath, data):
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
         try:
