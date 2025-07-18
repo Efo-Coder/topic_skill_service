@@ -70,19 +70,21 @@ def create_topic():
 
     return jsonify(topic), 201
 
+
 @app.route('/skills', methods=['POST'])
-def create_topic():
+def create_skill():
     new_skill_data = request.json
 
-    if not new_skill_data or 'name' not in new_skill_data or 'description' not in new_skill_data:
-        return jsonify({"error": "'name' and 'description' for the skill are required in the request body."}), 400
+    if not new_skill_data or 'name' not in new_skill_data or 'topicId' not in new_skill_data:
+        return jsonify({"error": "'name' and 'topicId' for the skill are required in the request body."}), 400
 
     new_skill_id = str(uuid.uuid4())
     
     skill = {
         "id": new_skill_id,
         "name": new_skill_data['name'],
-        "description": new_skill_data['description']
+        "topicId": new_skill_data['topicId'],
+        "difficulty": new_skill_data.get('difficulty', 'unknown')
     }
 
     skills = data_manager.read_data(SKILLS_FILE)
@@ -91,6 +93,7 @@ def create_topic():
     data_manager.write_data(SKILLS_FILE, skills)
 
     return jsonify(skill), 201
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
