@@ -27,15 +27,19 @@ def get_topics():
 @app.route('/skills', methods=['GET'])
 def get_skills():
     skills = data_manager.read_data(SKILLS_FILE) 
-    return jsonify(skills)  # Rückgabe als JSON-Antwort
+    return jsonify(skills)
 
 @app.route('/topics/<id>', methods=['GET'])
 def get_topic_by_id(id):
     topics = data_manager.read_data(TOPICS_FILE)
-    found_topics = [t for t in topics if t['id'] == id]
-    topic = found_topics[0] if found_topics else None
-    # topic = next((topic for topic in topic.get('id).lower() == id.lower()), None)
+    topic = next((topic for topic in topics if topic.get('id').lower() == id.lower()), None)
     return jsonify(topic)
+
+@app.route('/skills/<id>', methods=['GET'])
+def get_skill_by_id(id):
+    skills = data_manager.read_data(SKILLS_FILE)
+    skill = next((skill for skill in skills if skill.get('id').lower() == id.lower()), None)
+    return jsonify(skill)
 
 # Starte die Flask-Anwendung im Debug-Modus auf Port 5000
 if __name__ == "__main__":
