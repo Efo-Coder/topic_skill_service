@@ -1,7 +1,6 @@
-# Importieren von Modulen für Webentwicklung (Flask) und Dateiverwaltung
 import os
 from flask import Flask, jsonify
-from data_manager import JsonDataManager  # Import der selbst erstellten Klasse
+from data_manager import JsonDataManager
 
 
 app = Flask(__name__) # Erstelle eine Flask-Anwendung
@@ -12,6 +11,7 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 
 # Pfad zur Datei mit den Themen (topics)
 TOPICS_FILE = os.path.join(DATA_DIR, 'topics.json')
+SKILLS_FILE = os.path.join(DATA_DIR, 'skills.json')
 
 # Route für die Startseite der Anwendung
 @app.route('/')
@@ -23,6 +23,17 @@ def hello_world():
 def get_topics():
     topics = data_manager.read_data(TOPICS_FILE)  # Lese Themen aus der Datei
     return jsonify(topics)  # Rückgabe als JSON-Antwort
+
+@app.route('/skills', methods=['GET'])
+def get_skills():
+    skills = data_manager.read_data(SKILLS_FILE) 
+    return jsonify(skills)  # Rückgabe als JSON-Antwort
+
+@app.route('/topics/<id>', methods=['GET'])
+def get_topic_by_id(id):
+    topics = data_manager.read_data(TOPICS_FILE)
+    topic = [t for t in topics if t['id'] == id]
+    return jsonify(topic)
 
 # Starte die Flask-Anwendung im Debug-Modus auf Port 5000
 if __name__ == "__main__":
