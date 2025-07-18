@@ -32,7 +32,9 @@ def get_skills():
 @app.route('/topics/<id>', methods=['GET'])
 def get_topic_by_id(id):
     topics = data_manager.read_data(TOPICS_FILE)
-    topic = [t for t in topics if t['id'] == id]
+    found_topics = [t for t in topics if t['id'] == id]
+    topic = found_topics[0] if found_topics else None
+    # topic = next((topic for topic in topic.get('id).lower() == id.lower()), None)
     return jsonify(topic)
 
 # Starte die Flask-Anwendung im Debug-Modus auf Port 5000
