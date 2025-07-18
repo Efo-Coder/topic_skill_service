@@ -1,33 +1,32 @@
 import os
-from flask import Flask, jsonify
-from data_manager import JsonDataManager
+import uuid
+from flask import Flask, jsonify, request
+from data_manager import JsonDataManager 
 
+app = Flask(__name__)
+data_manager = JsonDataManager()
 
-app = Flask(__name__) # Erstelle eine Flask-Anwendung
-data_manager = JsonDataManager() # Instanz des JSON-Datenmanagers
-
-# Definition des Pfads zum Verzeichnis, in dem die Daten gespeichert sind
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
-
-# Pfad zur Datei mit den Themen (topics)
 TOPICS_FILE = os.path.join(DATA_DIR, 'topics.json')
 SKILLS_FILE = os.path.join(DATA_DIR, 'skills.json')
 
-# Route für die Startseite der Anwendung
+
 @app.route('/')
 def hello_world():
-    return '<p>Hello, World!</p>'
+    return "Hello from Topic and Skill Service!"
 
-# Route für das Abrufen der Themenliste im JSON-Format
+
 @app.route('/topics', methods=['GET'])
 def get_topics():
-    topics = data_manager.read_data(TOPICS_FILE)  # Lese Themen aus der Datei
-    return jsonify(topics)  # Rückgabe als JSON-Antwort
+    topics = data_manager.read_data(TOPICS_FILE)
+    return jsonify(topics)
+
 
 @app.route('/skills', methods=['GET'])
 def get_skills():
-    skills = data_manager.read_data(SKILLS_FILE) 
+    skills = data_manager.read_data(SKILLS_FILE)
     return jsonify(skills)
+
 
 @app.route('/topics/<id>', methods=['GET'])
 def get_topic_by_id(id):
@@ -47,7 +46,51 @@ def get_skill_by_id(id):
         return jsonify(skill)
     else:
         return jsonify({"error": "Skill not found."}), 404
+    
 
-# Starte die Flask-Anwendung im Debug-Modus auf Port 5000
-if __name__ == "__main__":
+@app.route('/topics', methods=['POST'])
+def create_topic():
+    new_topic_data = request.json
+
+    if not new_topic_data or 'name' not in new_topic_data or 'description' not in new_topic_data:
+        return jsonify({"error": "'name' and 'description' for the topic are required in the request body."}), 400
+
+    new_topic_id = str(uuid.uuid4())
+    
+    topic = {
+        "id": new_topic_id,
+        "name": new_topic_data['name'],
+        "description": new_topic_data['description']
+    }
+
+    topics = data_manager.read_data(TOPICS_FILE)
+    topics.append(topic)
+
+    data_manager.write_data(TOPICS_FILE, topics)
+
+    return jsonify(topic), 201
+
+@app.route('/skills', methods=['POST'])
+def create_topic():
+    new_skill_data = request.json
+
+    if not new_skill_data or 'name' not in new_skill_data or 'description' not in new_skill_data:
+        return jsonify({"error": "'name' and 'description' for the skill are required in the request body."}), 400
+
+    new_skill_id = str(uuid.uuid4())
+    
+    skill = {
+        "id": new_skill_id,
+        "name": new_skill_data['name'],
+        "description": new_skill_data['description']
+    }
+
+    skills = data_manager.read_data(SKILLS_FILE)
+    skills.append(skill)
+
+    data_manager.write_data(SKILLS_FILE, skills)
+
+    return jsonify(skill), 201
+
+if __name__ == '__main__':
     app.run(debug=True, port=5000)
